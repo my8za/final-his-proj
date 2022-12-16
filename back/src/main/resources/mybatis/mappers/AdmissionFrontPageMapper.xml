@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 병동 and 호실 기준 병상 현황 정보 불러오기 READ-->
+<mapper namespace="com.douzone.HISservice.repository.AdmissionFrontPageDAO">
+    <select id="getBedInfo" resultType="HashMap">
+        <!-- TEST쿼리 금일퇴원자 -->
+        <!--select count(*) as totalBed, count(CASE WHEN bed_status = 1 THEN 1 END) as usingBed , count(CASE WHEN bed_status = 0 THEN 1 END) as unusingBed , count(CASE WHEN DISCHARGE_DUEDATE = date_format(date_sub(now(), interval 1 day),'%Y-%m-%d') THEN 1 END) as outDuePatient-->
+<!--        select count(*) as totalBed, count(CASE WHEN bed_status = 1 THEN 1 END) as usingBed , count(CASE WHEN bed_status = 0 THEN 1 END) as unusingBed , count(CASE WHEN DISCHARGE_DUEDATE = date_format(now(),'%Y-%m-%d') THEN 1 END) as outDuePatient-->
+<!--        from BED_TB as a LEFT JOIN ADMISSION_TB AS b ON a.WARD = b.WARD  and a.ROOM_NUM = b.ROOM_NUM and a.BED_NUM = b.BED_NUM ;-->
+        SELECT count(*) AS totalBed, count(CASE WHEN bed_status = 1 THEN 1 END) AS usingBed , count(CASE WHEN bed_status = 0 THEN 1 END) AS unusingBed
+        from BED_TB;
+    </select>
+
+    <select id="getDisChargeCount" resultType="HashMap">
+        select count(CASE WHEN DISCHARGE_DUEDATE = date_format(now(),'%Y-%m-%d') and DISCHARGE_DATE is null THEN 1 END) as outDuePatient
+        from ADMISSION_TB;
+    </select>
+
+    <select id="getAvailable" resultType="HashMap">
+        select distinct(concat(ward+room_num)) as available_room
+        from BED_TB
+        where bed_status = 0 order by available_room;
+    </select>
+
+
+    <!-- 퇴원예정 LIST -->
+    <select id="getDisChargeList" resultType="HashMap">
+        SELECT ADMISSION_ID_PK, ADMISSION_STATUS_CODE ,C.PATIENT_NAME , if(SUBSTR(PATIENT_SSN,8,1)=1 or substr(PATIENT_SSN,8,1)=3 , 'M' ,'W') AS GENDER , (date_format(now(),'%Y')- concat('19',substr(PATIENT_SSN,1,2)))+1 AS AGE , date_format(DISCHARGE_DUEDATE,'%Y.%m.%d(%a)') AS DOW, C.PATIENT_SSN, A.WARD+A.ROOM_NUM AS WARDROOM , A.BED_NUM
+        FROM ADMISSION_TB as A
+        LEFT JOIN TREATMENT_INFO_TB as B on A.TREATMENT_NUM_FK = B.TREATMENT_NUM_PK
+        LEFT JOIN PATIENT_TB as C on B.PATIENT_ID_FK = C.PATIENT_ID_PK
+        WHERE DISCHARGE_DUEDATE = date_format(now(),'%Y-%m-%d') and DISCHARGE_DATE is null
+        ORDER BY C.PATIENT_NAME ASC;
+    </select>
+
+    <update id="putChangeBedState" parameterType="HashMap">
+        UPDATE BED_TB
+        SET BED_STATUS = 0
+        WHERE BED_NUM = #{BED_NUM} AND ROOM_NUM=#{ROOM_NUM} AND WARD=#{WARD};
+    </update>
+
+    <update id="putDisCharged" parameterType="HashMap">
+        UPDATE ADMISSION_TB
+        SET DISCHARGE_DATE = now()
+        WHERE ADMISSION_ID_PK = #{ADMISSION_ID_PK};
+    </update>
+
+<!-- 내 입원환자 리스트 가져오기 -->
+    <select id="getMyInPatient" resultType="HashMap">
+        SELECT a.PATIENT_ID_FK, b.ADMISSION_DATE, b.ROOM_NUM, c.PATIENT_NAME,  c.PATIENT_AGE, if(SUBSTR(PATIENT_SSN,8,1)=1 or substr(PATIENT_SSN,8,1)=3 , 'M' ,'W') AS GENDER , d.EMP_NAME
+        FROM TREATMENT_INFO_TB AS a
+            LEFT JOIN ADMISSION_TB AS b ON a.TREATMENT_NUM_PK = b.TREATMENT_NUM_FK
+            LEFT JOIN PATIENT_TB AS c ON a.PATIENT_ID_FK = c.PATIENT_ID_PK
+            LEFT JOIN EMP_INFO_TB AS d ON a.EMP_ID_FK = d.EMP_ID_PK
+        WHERE a.EMP_ID_FK = 'D220001' AND a.ADMISSION = 1 AND b.ADMISSION_DATE IS NOT NULL AND b.DISCHARGE_DATE IS NULL;
+   </select>
+</mapper>

@@ -1,0 +1,55 @@
+@import '../../styles/scss/elements';
+@import '../../styles/scss/variables';
+
+.waiting-4-payment {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  box-sizing: border-box;
+  text-align: center;
+  .section-title {
+    font-weight: 600;
+    margin-bottom: 10px
+  }
+  .content-box {
+    @extend %contentBox;
+    padding: 15px 10px;
+    height: 100%;
+    .waited-people {
+      display: grid;
+      gap: 8px;
+      grid-template-columns: 1fr;
+      grid-auto-rows: 45px;
+      height: 100%;
+    }
+    .waiting-order {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 10px 0 15px;
+      border-radius: 7px;
+      border: solid 1px $grey;
+      background-color: $white;
+      font-size: 15px;
+      cursor: pointer;
+      .medical-hours {
+        padding-left: 8px;
+      }
+      .status-value {
+        color: $primaryColor;
+        font-size: 14px;
+        font-weight: 600;
+      }
+      &.completion {
+        background-color: #e7e9ea;
+        color: #888;
+        .status-value {
+          color: #a2a9ac;
+        }
+      }
+    }
+    .waiting-order:hover {
+      border: #6d6969 2px solid;
+    }
+  }
+}

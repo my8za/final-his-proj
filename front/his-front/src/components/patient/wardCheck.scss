@@ -1,0 +1,36 @@
+@import '../../styles/scss/elements';
+@import '../../styles/scss/variables';
+
+.ward-check {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  
+  .filter select {
+    @extend %filter;
+    margin-bottom: 15px;
+    letter-spacing: 0;
+    &:last-child {margin-left: 15px;}
+  }
+  .table-wrapper {
+    height: 100%;
+    overflow-y: auto;
+    background-color: #fff;
+    .styled-table {
+      width: 100%;
+      border-collapse: collapse;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+      font-size: 14px;
+      text-align: center;
+      th,
+      td {
+        padding: 12px 15px;
+        border: 1px solid #828282;
+      }
+      th {background-color: #E5E5E5;}
+      td:first-child {
+        padding: 12px 0;
+      }
+    }
+  }
+}

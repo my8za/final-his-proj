@@ -1,0 +1,55 @@
+@import '../../styles/scss/elements';
+@import '../../styles/scss/variables';
+
+.detailed-status {
+  height: 100%;
+  padding: 25px 10px;
+  border-radius: 4px;
+  border: solid 0.5px $grey;
+  background-color: #e6eef2;
+  > p {margin-bottom: 15px;}
+  .order-content {
+    display: grid;
+    gap: 8px;
+    grid-template-columns: minmax(210px, 1fr);
+    // grid-auto-rows: auto-fill(minmax(35px, 1fr));
+    grid-auto-rows: 35px;
+    height: 250px;
+    overflow: auto;
+    .test {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 10px 0 15px;
+      box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.1);
+      background-color: rgba(255, 255, 255, 0.8);
+      font-size: 15px;
+      background-color: #888;
+    }
+    .waiting-order {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 10px 0 15px;
+      box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.1);
+      background-color: rgba(255, 255, 255, 0.8);
+      font-size: 15px;
+      .medical-hours {
+        padding-left: 8px;
+      }
+      .OA {font-size: 14px;color: #ffd700;}
+      .OB {font-size: 14px;color: #ff0000;}
+      .OC {font-size: 14px;color: #00AAFF;}
+      .OE {font-size: 14px;color: #000;}
+      &.selected {
+        // .status-value {color: $primaryColor;}
+      }
+      &.completion {
+        background-color: rgba(0, 0, 0, 0.15);
+      }
+    }
+    .OEbox {
+      background-color: #b4b0b0;
+    }
+  }
+}

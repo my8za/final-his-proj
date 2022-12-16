@@ -1,0 +1,72 @@
+@import '../../styles/scss/elements';
+@import '../../styles/scss/variables';
+
+.detail-box {
+    width: 100%;
+    height: 100%;
+    
+    > main {
+      display: flex;
+      justify-content: center;
+      padding: 20px 35px;
+      > div {width: 100%;}
+      p {
+        font-size: 17px;
+        font-weight: 600;
+      }
+
+      .patient-title,
+      .record-title {
+        float: left;
+        margin-bottom: 10px;
+      }
+
+      table {
+        width: 100%;
+        text-align: center;
+        margin-top: 10px;
+        font-size: 15px;
+
+        #SA {
+          float: left;
+          padding: 2px;
+          border: none;
+        }
+
+        th,
+        td { 
+          padding: 2px;
+          border: 1px solid $tblBorder;
+          vertical-align: middle;
+        }
+
+        th {
+          width: 8%;
+          background-color: $thColor;
+          font-weight: 600;
+        }
+
+        td {
+          input {width: 100%; border: none; outline: none;}
+          select {width: 100%; border: none; outline: none;}
+        }
+
+        .symptom,
+        .addr {
+          width: 685px;
+        }
+
+        .memo-tr {
+          height: 70px;
+        }
+
+      }
+
+      .record-box {
+        p {
+          margin-top: 50px;
+        }
+      }
+
+    }
+}

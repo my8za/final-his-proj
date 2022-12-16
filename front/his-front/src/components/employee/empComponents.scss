@@ -1,0 +1,34 @@
+@import '../../styles/scss/elements';
+
+.emp-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  .emp-location {
+    display: flex;
+    align-items: center;
+    p {font-size: 12px; font-weight: 500; letter-spacing: 1.2px;}
+  }
+  .emp-bar {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 40px;
+    padding: 0 20px;
+    border-radius: 4px;
+    box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.16);
+    background: linear-gradient(to bottom, #e7eaef 0%, #e2e7f0 100%);
+    .test2 {
+      display: flex;
+      padding-right: 50px;
+      .icon { color: $primaryColor;}
+      p{
+        font-size: 14px;
+        span {
+          padding: 0 5px 0 10px;
+          font-weight: 900;}
+      }
+    }
+  }
+}

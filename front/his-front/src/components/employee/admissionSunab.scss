@@ -1,0 +1,40 @@
+@import '../../styles/scss/elements';
+@import '../../styles/scss/variables';
+
+// .css-ahj2mt-MuiTypography-root {
+.qwer {
+
+    display: grid;  
+    gap: 25px;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+    grid-template-rows: 450px ;
+    // height: 100%;
+    // padding: 20px 35px;
+    grid-template-areas:
+        "a b b c c";
+
+    .a { grid-area: a; }
+    .b { grid-area: b; }
+    .c { grid-area: c; }
+
+    .filter{
+        margin-top: 50px;
+        margin-left: 30px;
+
+        li{
+            margin-top: 10px;
+        }
+    }
+}
+
+.asdf {
+
+    display: grid;  
+    gap: 25px;
+    grid-template-columns: 1fr;
+    grid-template-rows: 450px ;
+    grid-template-areas:
+        "a";
+
+    .a { grid-area: a; }
+}

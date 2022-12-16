@@ -1,0 +1,321 @@
+@import './scss/elements';
+@import './scss/variables';
+
+.doctor {
+  width: 100%;
+  height: 100%;
+
+  main {
+    display: grid;  
+    gap: 25px;
+    grid-template-columns: 1fr 335px;
+    grid-template-rows: 75px .8fr 1fr 435px;
+    height: 100%;
+    padding: 20px 35px;
+    .top {
+      grid-column-start: span 2;
+    }
+    .infoBox {
+      @extend %contentBox;
+      width: 1400px;
+      padding: 10px 20px;
+
+      .infoName,
+      .infoSsn {
+        font-weight: bold;
+      }
+
+      .nameInput,
+      .ssnInput {
+        font-size: 15px;
+        font-weight: normal;
+        border: 0;
+      }
+
+      .nameInput {
+        width: 80px;
+        height: 20px;
+      }
+
+      .ssnInput {
+        width: 150px;
+        height: 20px;
+      }
+
+      .dropdown {
+
+        display: inline-block;
+        position: relative;
+        left: 65.8%;
+
+        .dropdown-submenu {
+
+          display: none;
+          position: absolute;
+          left: 50%;
+          transform: translate(-50%);
+          z-index: 900;
+
+          .dropdown-box{
+
+            @extend %contentBox;
+
+            .dropdown-table {
+              width: 400px;
+              border: 1px solid;
+              border-collapse: collapse;
+              text-align: center;
+              margin-top: 10px;
+      
+              th,
+              td{
+                padding: 2px 0;
+                border: 1px solid $tblBorder;
+                font-size: 15px;
+              }
+      
+              th {
+                background-color: $thColor;
+                font-weight: 600;
+              }
+      
+              button {
+                border: none;
+                border-radius: 4px;
+                line-height: 20px;
+                background-color: $primaryColor;
+                color: $white;
+                cursor: pointer;
+              }
+
+            }
+          }
+        }
+      }
+
+      .dropdown:hover .dropdown-submenu {
+        display: block;
+      }
+      
+      .infoTable {
+        width: 100%;
+        text-align: left;
+        margin-top: 10px;
+        font-size: 15px;
+
+        th,
+        td {padding: 4px 0 4px 10px; border: 1px solid $tblBorder;
+          &.devide1 {width: 6%;}
+        }
+
+        th {
+          background-color: $thColor;
+          font-weight: 600;
+        }
+        td {
+          input {width: 100%; border: none; outline: none;}
+          select {width: 100%; border: none; outline: none;}
+        }
+      }
+    }
+    
+    .item2 {
+      grid-row-start: span 2;
+      height: 100%;
+    }
+    .admissionBox {
+      @extend %contentBox;
+      width: 1400px;
+      height: 150px;
+      padding: 15px 0;
+      overflow-y: scroll;
+      overflow-x: hidden;
+
+      .admissionTitle {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 10px;
+        font-weight: 600;
+      }
+
+      .line {
+        width: 1400px;
+        height: 3px;
+        margin-bottom: 10px;
+        background-color: $primaryColor;
+      }
+
+      .admissionTb {
+        width: 1390px;
+        border: 1px solid;
+        border-collapse: collapse;
+        text-align: center;
+        margin-top: 10px;
+
+        .admissionTh,
+        .admissionTd {
+          padding: 6px 20px;
+          border: 1px solid $tblBorder;
+        }
+
+        .admissionTh {
+          font-weight: bold;
+          font-size: 15px;
+          background-color: $thColor;
+        }
+
+        .admissionTd {
+          font-size: 15px;
+        }
+
+
+      }
+    } 
+    
+    .treatment-box {
+      @extend %contentBox;
+      width: 1400px;
+      padding: 15px 0;
+
+      .box-title {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 10px;
+        font-weight: 600;
+      }
+
+      .line {
+        width: 1400px;
+        height: 3px;
+        margin-bottom: 10px;
+        background-color: $primaryColor;
+      }
+
+      .treatment-form {
+        padding: 0 30px;
+
+        .divide1 {
+          
+          height: 150px;
+
+          .diagnosis-div {
+
+            display: inline-block;
+            vertical-align: top;
+            margin-top: 35px;
+            
+            .diagnosis-title {
+              font-size: 17px;
+              font-weight: 600;
+            }
+    
+            .diagnosis-select {
+              width: 170px;
+              height: 25px;
+              text-align: center;
+              margin-left: 20px;
+              border: 1px solid $tblBorder;
+              border-radius: 5px;
+              font-size: 15px;
+              font-weight: 600;
+            }
+  
+          }
+  
+          .order-div {
+  
+            margin-top: 35px;
+  
+            .treatment-checkbox,
+            .medicine-checkbox,
+            .admission-checkbox {
+              margin-left: 25px;
+            }
+  
+            span {
+              font-weight: 600;
+            }
+          }
+
+          .order-detail {
+
+            display: inline-block;
+            margin-left: 30px;
+            
+            span {
+              font-size: 17px;
+              font-weight: 600;
+            }
+  
+            textarea {
+              width: 300px;
+              height: 120px;
+              margin-top: 10px;
+              border: 1px solid $tblBorder;
+              border-radius: 5px;
+              resize: none;
+            }
+
+            .medicine-div {
+              display: inline-block;
+              width: 300px;
+              height: 120px;
+              margin-top: 10px;
+              border: 1px solid $tblBorder;
+              border-radius: 5px;
+
+              .medicine-table {
+                border-style: hidden;
+
+                th,
+                td {
+                  padding: 1.9px 10px; 
+                  border: 1px solid $tblBorder;
+                  border-radius: 5px;
+                }
+
+                th {
+                  font-weight: 600;
+                  width: 257px;
+                }
+              }
+            }
+  
+            .treatment-detail,
+            .medicine-detail,
+            .admission-detail {
+              display: inline-block;
+              margin-left: 19px;
+            }
+
+          }
+  
+        }
+
+      }
+
+        .divide2 {
+  
+          .memo-div {
+  
+            span {
+              font-size: 17px;
+              font-weight: 600;
+            }
+  
+            textarea {
+              width: 1340px;
+              height: 150px;
+              border: 1px solid $tblBorder;
+              border-radius: 5px;
+            }
+          }
+        }
+                
+        a {
+          float: right;
+          margin-top: 6px;
+        }
+      }
+    }
+  }

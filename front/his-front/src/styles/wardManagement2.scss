@@ -1,0 +1,68 @@
+@import './scss/elements';
+@import './scss/variables';
+
+.ward-management2 {
+  width: 100%;
+  height: 100%;
+
+  main {
+    display: grid;  
+    gap: 25px;
+    grid-template-columns: .5fr 1fr;
+    grid-template-rows: 75px 272px 415px;
+    height: 100%;
+    padding: 20px 35px;
+    .top {
+      grid-column-start: span 4;
+    }
+    .item1 {
+      grid-column-start: span 1;
+      height: 100%;
+    }
+    .item2 {
+      grid-column-start: span 3;
+      height: 100%;
+      border-radius: 7px;
+      box-shadow: 1px 1px 6px 0 rgb(0 0 0 / 25%);
+      background-color: #fff;
+      display: grid;
+      gap: 4px;
+      grid-template-columns: repeat(4,1fr);
+      grid-template-rows: 30px 30px 1fr;
+      
+     .inpatientDetail-wapper{
+      grid-column-start: span 4;
+     }
+    }
+    .item3 {
+      grid-column-start: span 1;
+      height: 100%;
+      border-radius: 7px;
+      box-shadow: 1px 1px 6px 0 rgb(0 0 0 / 25%);
+      background-color: #fff;
+    }
+    .item4 {
+      grid-column-start: span 3;
+      height: 100%;
+      border-radius: 7px;
+      box-shadow: 1px 1px 6px 0 rgb(0 0 0 / 25%);
+      background-color: #fff;
+      .item4-tap{
+        display: flex;
+        grid-column-start: span 4;
+        
+        li{
+          margin-left: 25px;
+          margin-bottom: 10px;
+          text-align: center;
+        }
+      }
+      .line {
+        width: 100%;
+        height: 3px;
+        background-color: $primaryColor;
+      }
+  
+    }
+  }
+}

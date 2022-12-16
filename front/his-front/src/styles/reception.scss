@@ -1,0 +1,75 @@
+@import './scss/elements';
+@import './scss/variables';
+
+.reception{
+  width: 100%;
+  height: 100%;
+  
+  main {
+    display: grid;  
+    gap: 15px;
+    grid-template-columns: 2.5fr 1fr 1fr;
+    grid-template-rows: 75px 250px 1fr;
+    height: 100%;
+    padding: 20px 35px;
+    .top {
+      grid-column-start: span 3;
+    }
+    .middle {
+      @extend %contentBox;
+      grid-column-start: span 3;
+      display: flex;
+      flex-direction: column;
+      padding: 10px 20px;
+      .search-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-bottom: 10px;
+        .input-patient {
+          display: flex;
+          align-items: center;
+          font-size: 14px;
+          letter-spacing: 0.72px;
+          label {font-weight: 600;}
+          input {
+            width: 150px;
+            margin-right: 10px;
+            margin-left: 10px;
+            padding-bottom: 2px;
+            border: none;
+            border-bottom: 1px solid $grey;
+            outline: 0;
+            font-size: 14px;
+            text-align: center;
+          }
+        }
+        .btns {
+          .regbtn {
+            display: inline-block;
+            width: 75px;
+            height: 30px;
+            border-radius: 4px;
+            background-color: #0af;
+            color: $white;
+            font-size: 14px;
+            text-align: center;
+            text-decoration: none;
+            line-height: 30px;
+            letter-spacing: 2.5px;
+            border: white;
+            cursor: pointer;
+          }
+        }
+        .regbtn:last-child {margin-left: 20px;}
+      }
+      
+      .sample {
+        height: 50px;
+        border: 2px solid $tblBorder;
+        border-radius: 4px;
+        box-sizing: border-box;
+      }
+    }
+  }
+}

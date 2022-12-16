@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 입원환자 수납 정보 READ-->
+<mapper namespace="com.douzone.HISservice.repository.ReceiptDAO">
+
+    <select id="getChangeStateList" resultType="HashMap">
+        select ADMISSION_ID_PK
+        from ADMISSION_TB
+        where ADMISSION_STATUS_CODE = 'IC' and DISCHARGE_DUEDATE = date_format(now(),'%Y-%m-%d');
+    </select>
+
+    <update id="putChangeState" parameterType="HashMap">
+        UPDATE ADMISSION_TB
+        SET ADMISSION_STATUS_CODE = 'ID'
+        WHERE ADMISSION_ID_PK = #{ADMISSION_ID_PK};
+    </update>
+
+    <select id="getChangeMiddleList" resultType="HashMap">
+        select ADMISSION_ID_PK
+        from ADMISSION_TB
+        where (TIMESTAMPDIFF(DAY, ADMISSION_DATE , now()))*50000 >= 1250000 and ADMISSION_STATUS_CODE = 'IC';
+    </select>
+
+    <update id="putChangeMiddle" parameterType="HashMap">
+        UPDATE ADMISSION_TB
+        SET MIDDLE_PAY_DATE = date_format(now(),'%Y-%m-%d')
+        WHERE ADMISSION_ID_PK = #{ADMISSION_ID_PK};
+    </update>
+
+    <select id="getAdReceiptListToday" parameterType="String" resultType="HashMap">
+        SELECT ADMISSION_ID_PK, ADMISSION_STATUS_CODE ,C.PATIENT_NAME , if(SUBSTR(PATIENT_SSN,8,1)=1 or substr(PATIENT_SSN,8,1)=3 , 'M' ,'W') AS GENDER , (date_format(now(),'%Y')- concat('19',substr(PATIENT_SSN,1,2)))+1 AS AGE , A.WARD+A.ROOM_NUM AS WARDROOM , A.BED_NUM
+        from ADMISSION_TB as A
+        LEFT JOIN TREATMENT_INFO_TB as B on A.TREATMENT_NUM_FK = B.TREATMENT_NUM_PK
+        LEFT JOIN PATIENT_TB as C on B.PATIENT_ID_FK = C.PATIENT_ID_PK
+        WHERE DISCHARGE_DUEDATE = date_format(now(),'%Y-%m-%d') AND ADMISSION_STATUS_CODE = 'ID';
+    </select>
+
+    <select id="getMiddlePaymentList" parameterType="String" resultType="HashMap">
+        SELECT ADMISSION_ID_PK, ADMISSION_STATUS_CODE ,C.PATIENT_NAME , if(SUBSTR(PATIENT_SSN,8,1)=1 or substr(PATIENT_SSN,8,1)=3 , 'M' ,'W') AS GENDER , (date_format(now(),'%Y')- concat('19',substr(PATIENT_SSN,1,2)))+1 AS AGE , A.WARD+A.ROOM_NUM AS WARDROOM , A.BED_NUM
+        from ADMISSION_TB as A
+        LEFT JOIN TREATMENT_INFO_TB as B on A.TREATMENT_NUM_FK = B.TREATMENT_NUM_PK
+        LEFT JOIN PATIENT_TB as C on B.PATIENT_ID_FK = C.PATIENT_ID_PK
+        where ((TIMESTAMPDIFF(DAY, ADMISSION_DATE , now()))*50000 >= 1250000 and ADMISSION_STATUS_CODE = 'IC' and MIDDLE_PAY_DATE is null) OR ((TIMESTAMPDIFF(DAY, MIDDLE_PAY_DATE , now()))*50000 >= 1250000 and ADMISSION_STATUS_CODE = 'IC' and MIDDLE_PAY_DATE is not null);
+    </select>
+
+    <select id="getAdReceiptListAll" parameterType="String" resultType="HashMap">
+
+        SELECT
+            ADMISSION_ID_PK, ADMISSION_STATUS_CODE ,C.PATIENT_NAME ,
+            if(SUBSTR(PATIENT_SSN,8,1)=1 or substr(PATIENT_SSN,8,1)=3 , 'M' ,'W') AS GENDER ,
+            (date_format(now(),'%Y')- concat('19',substr(PATIENT_SSN,1,2)))+1 AS AGE ,
+            A.WARD+A.ROOM_NUM AS WARDROOM , A.BED_NUM
+        from
+            ADMISSION_TB as A
+                LEFT JOIN TREATMENT_INFO_TB as B on A.TREATMENT_NUM_FK = B.TREATMENT_NUM_PK
+                LEFT JOIN PATIENT_TB as C on B.PATIENT_ID_FK = C.PATIENT_ID_PK
+        WHERE
+            (DISCHARGE_DUEDATE = date_format(now(),'%Y-%m-%d') AND ADMISSION_STATUS_CODE = 'ID') OR ((TIMESTAMPDIFF(DAY, ADMISSION_DATE , now()))*50000 >= 1250000 and ADMISSION_STATUS_CODE = 'IC' and MIDDLE_PAY_DATE is null) OR ((TIMESTAMPDIFF(DAY, MIDDLE_PAY_DATE , now()))*50000 >= 1250000 and ADMISSION_STATUS_CODE = 'IC' and MIDDLE_PAY_DATE is not null);
+    </select>
+
+    <select id="getAdReceipt"  parameterType="String" resultType="HashMap">
+        select
+            a.ADMISSION_ID_PK ,
+            ADMISSION_DATE ,
+            ADMISSION_STATUS_CODE,
+            MIDDLE_PAY_DATE,
+            DISCHARGE_DUEDATE ,
+            if(MIDDLE_PAY_DATE is null,
+                if(DISCHARGE_DUEDATE is null ,
+                    TIMESTAMPDIFF(DAY, ADMISSION_DATE , date_format(now(),'%Y-%m-%d')),
+                    TIMESTAMPDIFF(DAY, ADMISSION_DATE , DISCHARGE_DUEDATE)
+                )
+            ,
+                if(MIDDLE_PAY_DATE <![CDATA[<]]> date_format(now(),'%Y-%m-%d'),
+                    TIMESTAMPDIFF(DAY, MIDDLE_PAY_DATE , date_format(now(),'%Y-%m-%d')),
+                    TIMESTAMPDIFF(DAY, ADMISSION_DATE , MIDDLE_PAY_DATE)
+                )
+            ) as ADMISSION_TOTAL_DAY,
+            a.TREATMENT_NUM_FK,
+            <!--insurance_cost-->
+            if(MIDDLE_PAY_DATE is null,
+                if(DISCHARGE_DUEDATE is null ,
+                    if(INSURANCE = 1, truncate((TIMESTAMPDIFF(DAY, ADMISSION_DATE , date_format(now(),'%Y-%m-%d'))*50000)*0.25,0), 0) ,
+                    if(INSURANCE = 1, truncate((TIMESTAMPDIFF(DAY, ADMISSION_DATE , DISCHARGE_DUEDATE)*50000)*0.25,0), 0)
+                )
+            ,
+                if(MIDDLE_PAY_DATE <![CDATA[<]]> date_format(now(),'%Y-%m-%d'),
+                    if(INSURANCE = 1, truncate((TIMESTAMPDIFF(DAY, MIDDLE_PAY_DATE , date_format(now(),'%Y-%m-%d'))*50000)*0.25,0), 0),
+                    if(INSURANCE = 1, truncate((TIMESTAMPDIFF(DAY, ADMISSION_DATE , MIDDLE_PAY_DATE)*50000)*0.25,0), 0)
+                )
+            ) as INSURANCE_COST ,
+            <!--total_cost-->
+            if(MIDDLE_PAY_DATE is null,
+                if(DISCHARGE_DUEDATE is null ,
+                    if(INSURANCE = 1
+                        , ((TIMESTAMPDIFF(DAY, ADMISSION_DATE , date_format(now(),'%Y-%m-%d')))*50000) - truncate((TIMESTAMPDIFF(DAY, ADMISSION_DATE , date_format(now(),'%Y-%m-%d'))*50000)*0.25,0)
+                        , (TIMESTAMPDIFF(DAY, ADMISSION_DATE , date_format(now(),'%Y-%m-%d'))*50000))
+                ,
+                    if(INSURANCE = 1
+                        , ((TIMESTAMPDIFF(DAY, ADMISSION_DATE , DISCHARGE_DUEDATE))*50000) - truncate((TIMESTAMPDIFF(DAY, ADMISSION_DATE , DISCHARGE_DUEDATE)*50000)*0.25,0)
+                        , (TIMESTAMPDIFF(DAY, ADMISSION_DATE , DISCHARGE_DUEDATE)*50000))
+                    )
+            ,
+                if(MIDDLE_PAY_DATE <![CDATA[<]]> date_format(now(),'%Y-%m-%d'),
+                    if(INSURANCE = 1
+                        , ((TIMESTAMPDIFF(DAY, MIDDLE_PAY_DATE , date_format(now(),'%Y-%m-%d')))*50000) - truncate((TIMESTAMPDIFF(DAY, MIDDLE_PAY_DATE , date_format(now(),'%Y-%m-%d'))*50000)*0.25,0)
+                       , (TIMESTAMPDIFF(DAY, MIDDLE_PAY_DATE , date_format(now(),'%Y-%m-%d'))*50000))
+            ,
+                    if(INSURANCE = 1
+                        , ((TIMESTAMPDIFF(DAY, ADMISSION_DATE , MIDDLE_PAY_DATE))*50000) - truncate((TIMESTAMPDIFF(DAY, ADMISSION_DATE , MIDDLE_PAY_DATE)*50000)*0.25,0)
+                        , (TIMESTAMPDIFF(DAY, ADMISSION_DATE , MIDDLE_PAY_DATE)*50000))
+                    )
+            ) as TOTAL_COST
+        from
+            ADMISSION_TB as a
+                left join TREATMENT_INFO_TB as b on a.TREATMENT_NUM_FK = b.TREATMENT_NUM_PK
+                left join PATIENT_TB as c on b.PATIENT_ID_FK = c.PATIENT_ID_PK
+        where
+             ADMISSION_ID_PK = #{admissionId};
+    </select>
+
+    <!--입원환자 수납 완료 정보 CREATE-->
+    <insert id="setAdReceipt" parameterType="HashMap">
+        INSERT INTO
+            INPATIENT_RECEIPT_TB
+                                (
+                                    INRECEIPT_ID_PK,
+                                    ADMISSION_ID_FK,
+                                    TREATMENT_NUM_FK,
+                                    ADMISSION_COST,
+                                    INSURANCE_COST,
+                                    TOTAL_COST,
+                                    PAYMENT_DATE
+                                )
+            VALUES
+                                (
+                                    (SELECT CONCAT('IR',SUBSTR(NOW(),3,2)*1000000 + 1 + (SELECT COUNT(*) FROM INPATIENT_RECEIPT_TB AS a))),
+                                    #{ADMISSION_ID_PK},
+                                    #{TREATMENT_NUM_FK},
+                                    #{ADMISSION_TOTAL_DAY}*50000,
+                                    #{INSURANCE_COST},
+                                    #{TOTAL_COST},
+                                    date_format(now(),'%Y-%m-%d')
+                                );
+    </insert>
+
+    <!-- 환자 상태값 변경 -->
+    <update id="putReceiptComplete" parameterType="HashMap">
+        UPDATE ADMISSION_TB
+        <if test="MIDDLE_PAY_DATE == null and DISCHARGE_DUEDATE != null">
+        SET ADMISSION_STATUS_CODE = 'IE'
+        </if>
+        <if test="MIDDLE_PAY_DATE != null and DISCHARGE_DUEDATE != null">
+            SET ADMISSION_STATUS_CODE = 'IE'
+        </if>
+        <if test="MIDDLE_PAY_DATE == null and DISCHARGE_DUEDATE == null">
+            SET MIDDLE_PAY_DATE = date_format(now(),'%Y-%m-%d')
+        </if>
+        <if test="MIDDLE_PAY_DATE != null and DISCHARGE_DUEDATE == null">
+            SET MIDDLE_PAY_DATE = date_format(now(),'%Y-%m-%d')
+        </if>
+        WHERE ADMISSION_ID_PK = #{ADMISSION_ID_PK};
+    </update>
+
+</mapper>

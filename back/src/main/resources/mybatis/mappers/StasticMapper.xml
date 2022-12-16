@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.douzone.HISservice.repository.StasticDAO">
+
+    <!-- mypage 정보 불러오기 -->
+    <select id="getYearStastics" parameterType="HashMap" resultType="HashMap">
+        SELECT
+            (SUM(a.TOTAL_COST) + (SELECT SUM(e.TOTAL_COST) from OUTPATIENT_RECEIPT_TB AS e
+                LEFT JOIN TREATMENT_INFO_TB AS f ON e.TREATMENT_NUM_FK = f.TREATMENT_NUM_PK
+                LEFT JOIN RECEIVE_TB AS g ON  f.RECEIVE_ID_FK = g.RECEIVE_ID_PK
+                WHERE substr(TREATMENT_DATE,1,4) = #{nowYear})) AS totalIncome ,
+
+            ((SELECT SUM(a.TOTAL_COST)
+              from INPATIENT_RECEIPT_TB AS a
+                       LEFT JOIN ADMISSION_TB AS b ON  a.ADMISSION_ID_FK = b.ADMISSION_ID_PK
+                       LEFT JOIN TREATMENT_INFO_TB AS c ON  b.TREATMENT_NUM_FK  = c.TREATMENT_NUM_PK
+                       LEFT JOIN RECEIVE_TB AS d ON  c.RECEIVE_ID_FK = d.RECEIVE_ID_PK
+              WHERE   substr(TREATMENT_DATE,1,4) = #{nowYear} AND d.SPECIALITY = #{spectiality})
+                +
+             (SELECT SUM(e.TOTAL_COST) from OUTPATIENT_RECEIPT_TB AS e
+                                                LEFT JOIN TREATMENT_INFO_TB AS f ON e.TREATMENT_NUM_FK = f.TREATMENT_NUM_PK
+                                                LEFT JOIN RECEIVE_TB AS g ON  f.RECEIVE_ID_FK = g.RECEIVE_ID_PK
+              WHERE substr(TREATMENT_DATE,1,4) = #{nowYear} AND g.SPECIALITY = #{spectiality})
+                ) AS spectialityIncome,
+
+            (SELECT COUNT(a.TOTAL_COST)
+             from INPATIENT_RECEIPT_TB AS a
+                      LEFT JOIN ADMISSION_TB AS b ON  a.ADMISSION_ID_FK = b.ADMISSION_ID_PK
+                      LEFT JOIN TREATMENT_INFO_TB AS c ON  b.TREATMENT_NUM_FK  = c.TREATMENT_NUM_PK
+                      LEFT JOIN RECEIVE_TB AS d ON  c.RECEIVE_ID_FK = d.RECEIVE_ID_PK
+             WHERE   substr(TREATMENT_DATE,1,4) = #{nowYear}) AS toalInPatientNum,
+
+            (SELECT COUNT(e.TOTAL_COST) from OUTPATIENT_RECEIPT_TB AS e
+                                                 LEFT JOIN TREATMENT_INFO_TB AS f ON e.TREATMENT_NUM_FK = f.TREATMENT_NUM_PK
+                                                 LEFT JOIN RECEIVE_TB AS g ON  f.RECEIVE_ID_FK = g.RECEIVE_ID_PK
+             WHERE substr(TREATMENT_DATE,1,4) = #{nowYear}) AS totalOutPatinetNum,
+
+            (SELECT COUNT(a.TOTAL_COST)
+             from INPATIENT_RECEIPT_TB AS a
+                      LEFT JOIN ADMISSION_TB AS b ON  a.ADMISSION_ID_FK = b.ADMISSION_ID_PK
+                      LEFT JOIN TREATMENT_INFO_TB AS c ON  b.TREATMENT_NUM_FK  = c.TREATMENT_NUM_PK
+                      LEFT JOIN RECEIVE_TB AS d ON  c.RECEIVE_ID_FK = d.RECEIVE_ID_PK
+             WHERE   substr(TREATMENT_DATE,1,4) = #{nowYear} AND d.SPECIALITY = #{spectiality}) AS spectialityInPatientNum,
+
+            (SELECT COUNT(e.TOTAL_COST) from OUTPATIENT_RECEIPT_TB AS e
+                                                 LEFT JOIN TREATMENT_INFO_TB AS f ON e.TREATMENT_NUM_FK = f.TREATMENT_NUM_PK
+                                                 LEFT JOIN RECEIVE_TB AS g ON  f.RECEIVE_ID_FK = g.RECEIVE_ID_PK
+             WHERE substr(TREATMENT_DATE,1,4) = #{nowYear} AND g.SPECIALITY = #{spectiality}) AS spectialityOutPatinetNum,
+
+            (SELECT DISTINCT SPECIALITY FROM RECEIVE_TB WHERE SPECIALITY = #{spectiality} ) AS SPECIALITY,
+            (SELECT DISTINCT substr(TREATMENT_DATE,1,4) FROM TREATMENT_INFO_TB  WHERE substr(TREATMENT_DATE,1,4) = #{nowYear}) AS YEAR
+        FROM INPATIENT_RECEIPT_TB AS a
+                 LEFT JOIN ADMISSION_TB AS b ON  a.ADMISSION_ID_FK = b.ADMISSION_ID_PK
+                 LEFT JOIN TREATMENT_INFO_TB AS c ON  b.TREATMENT_NUM_FK  = c.TREATMENT_NUM_PK
+                 LEFT JOIN RECEIVE_TB AS d ON  c.RECEIVE_ID_FK = d.RECEIVE_ID_PK
+        WHERE   substr(TREATMENT_DATE,1,4) = #{nowYear};
+    </select>
+</mapper>

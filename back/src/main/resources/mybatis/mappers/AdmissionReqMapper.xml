@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!--특정 환자 입원 정보 READ-->
+<mapper namespace="com.douzone.HISservice.repository.AdmissionReqDAO">
+
+    <!--입원오더리스트-->
+    <select id="getAdmissionOrder" resultType="HashMap">
+        SELECT A.ADMISSION_ID_PK , A.ADMISSION_DUEDATE, C.PATIENT_NAME ,C.GENDER, C.PATIENT_AGE , C.PATIENT_SSN , E.SPECIALITY_NAME, E.WARD, D.EMP_NAME , date_format(B.TREATMENT_DATE,'%H%I') as T_TIME ,B.TREATMENT_MEMO
+        FROM ADMISSION_TB AS A
+            LEFT JOIN TREATMENT_INFO_TB AS B ON A.TREATMENT_NUM_FK = B.TREATMENT_NUM_PK
+            LEFT JOIN PATIENT_TB AS C ON B.PATIENT_ID_FK = C.PATIENT_ID_PK
+            LEFT JOIN EMP_INFO_TB AS D ON B.EMP_ID_FK = D.EMP_ID_PK
+            LEFT JOIN SPECIALITY_TB AS E ON D.SPECIALITY_ID_FK = E.SPECIALITY_ID_PK
+        WHERE ADMISSION_STATUS_CODE = 'IA'
+        ORDER BY T_TIME ASC;
+    </select>
+
+    <!-- 입원승인 -->
+    <update id="putAdmissionAccept" parameterType="HashMap">
+        UPDATE ADMISSION_TB
+        SET
+            ward = #{WARD} , room_num = #{ROOM_NUM} , bed_num = #{BED_NUM} , ADMISSION_STATUS_CODE = "IB"
+        WHERE ADMISSION_ID_PK = #{ADMISSION_ID_PK}
+        AND 0 = (SELECT bed_status FROM BED_TB WHERE ward = #{WARD} AND room_num = #{ROOM_NUM} AND bed_num = #{BED_NUM});
+    </update>
+
+    <!-- 배드상태변경 -->
+    <update id="putBedStatusIn" parameterType="HashMap">
+        UPDATE BED_TB
+        SET
+            BED_STATUS = 1
+        WHERE ward = #{WARD} AND room_num = #{ROOM_NUM} AND bed_num = #{BED_NUM};
+    </update>
+
+
+    <!-- 입원반려 -->
+    <update id="putAdmissionNotAccept" parameterType="HashMap">
+        UPDATE ADMISSION_TB
+        SET
+            ADMISSION_STATUS_CODE = 'IF',
+            REJECT_REASON = #{rejectReason}
+        WHERE ADMISSION_ID_PK = #{admissionIdPk};
+    </update>
+
+    <!--입원예정리스트-->
+    <select id="getAdmissionDueList" resultType="HashMap">
+        SELECT A.ADMISSION_ID_PK , A.ADMISSION_DUEDATE,PATIENT_NAME , if(substr(PATIENT_SSN,8,1)=1 or substr(PATIENT_SSN,8,1)=3 , 'M' ,'W') as GENDER , (date_format(now(),'%Y')- concat('19',substr(PATIENT_SSN,1,2)))+1 as AGE, PATIENT_SSN, A.WARD+A.ROOM_NUM as WARDROOM, A.BED_NUM
+        FROM ADMISSION_TB AS A
+            LEFT JOIN TREATMENT_INFO_TB AS B ON A.TREATMENT_NUM_FK = B.TREATMENT_NUM_PK
+            LEFT JOIN PATIENT_TB AS C ON B.PATIENT_ID_FK = C.PATIENT_ID_PK
+            LEFT JOIN EMP_INFO_TB AS D ON B.EMP_ID_FK = D.EMP_ID_PK
+            LEFT JOIN SPECIALITY_TB AS E ON D.SPECIALITY_ID_FK = E.SPECIALITY_ID_PK
+        WHERE ADMISSION_STATUS_CODE = 'IB';
+    </select>
+
+    <!-- 입원완료 -->
+    <update id="putAdmissionComplete" parameterType="HashMap">
+        UPDATE ADMISSION_TB SET ADMISSION_DATE = now() , ADMISSION_STATUS_CODE = "IC"
+        WHERE ADMISSION_ID_PK = #{admissionIdPk};
+    </update>
+</mapper>

@@ -1,0 +1,32 @@
+@import '../../styles/scss/elements';
+@import '../../styles/scss/variables';
+
+.medical-history {
+  width: 100%;
+  margin-top: 10px;
+  overflow-y: auto;
+  table {
+    width: 100%;
+    font-size: 14px;
+    text-align: center;
+    th,
+    td {padding: 3px 0 3px 10px; border: 1px solid $tblBorder;
+    }
+    th {
+      background-color: $thColor;
+      font-weight: 600;
+    }
+    td {
+      input {width: 100%; border: none; outline: none;}
+    }
+  }
+  .btn-detail {
+    display: inline-block;
+    padding: 0 5px;
+    border-radius: 4px;
+    line-height: 20px;
+    background-color: $primaryColor;
+    color: $white;
+    cursor: pointer;
+  }
+}

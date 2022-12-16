@@ -1,0 +1,10 @@
+@import './scss/variables';
+@import './scss/elements';
+
+* {box-sizing: border-box;}
+body {
+  background: $bg;
+}
+
+a.btn {@extend %btn;}
+

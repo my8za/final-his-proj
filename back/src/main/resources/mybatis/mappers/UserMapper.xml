@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.douzone.HISservice.repository.UserDAO">
+
+<!-- mypage 정보 불러오기 -->
+    <select id="getMyInfo" parameterType="HashMap" resultType="HashMap">
+        SELECT a.*, b.SPECIALITY_NAME, b.WARD,
+               CASE
+                   WHEN(SUBSTR(EMP_ID_PK, 1, 1) = 'D') THEN '의사'
+                   WHEN(SUBSTR(EMP_ID_PK, 1, 1) = 'I') THEN '외래간호사'
+                   WHEN(SUBSTR(EMP_ID_PK, 1, 1) = 'O') THEN '병동간호사'
+                   WHEN(SUBSTR(EMP_ID_PK, 1, 1) = 'R') THEN '원무'
+
+                   END AS JOB_NAME
+        FROM EMP_INFO_TB AS a
+                 LEFT JOIN SPECIALITY_TB AS b ON a.SPECIALITY_ID_FK = b.SPECIALITY_ID_PK
+        WHERE EMP_ID_PK = #{pk};
+    </select>
+
+<!-- 비밀번호 변경-->
+    <update id="changePwd">
+        UPDATE EMP_INFO_TB
+        SET PW = #{newPwd}
+        WHERE EMP_ID_PK = #{pk}
+    </update>
+
+<!-- 주소 변경-->
+    <update id="changeAddr">
+        UPDATE EMP_INFO_TB
+        SET EMP_ADDR = #{newAddr}
+        WHERE EMP_ID_PK = #{pk}
+    </update>
+
+<!-- 헤더 정보 -->
+    <select id="getHeaderInfo" parameterType="String" resultType="HashMap">
+        SELECT a.EMP_NAME, b.SPECIALITY_NAME, SUBSTR(NOW(), 1, 10) AS WORKING_DATE,
+               CASE
+                   WHEN(WEEKDAY(NOW()) = 0) THEN '월'
+                   WHEN(WEEKDAY(NOW()) = 1) THEN '화'
+                   WHEN(WEEKDAY(NOW()) = 2) THEN '수'
+                   WHEN(WEEKDAY(NOW()) = 3) THEN '목'
+                   WHEN(WEEKDAY(NOW()) = 4) THEN '금'
+                   WHEN(WEEKDAY(NOW()) = 5) THEN '토'
+                   WHEN(WEEKDAY(NOW()) = 6) THEN '일'
+                   END AS WORKING_DAY,
+               CASE
+                   WHEN(SUBSTR(EMP_ID_PK, 1, 1) = 'D') THEN '외래 진료'
+                   WHEN(SUBSTR(EMP_ID_PK, 1, 1) = 'I') THEN '외래 환자 치료'
+                   WHEN(SUBSTR(EMP_ID_PK, 1, 1) = 'O') THEN '병동 관리'
+                   WHEN(SUBSTR(EMP_ID_PK, 1, 1) = 'R') THEN '환자 접수 및 수납'
+                   END AS WORK
+        FROM EMP_INFO_TB AS a
+            LEFT JOIN SPECIALITY_TB AS b ON a.SPECIALITY_ID_FK = b.SPECIALITY_ID_PK
+        WHERE EMP_ID_PK = #{pk};
+    </select>
+
+    <insert id="addDoctorSchedule" parameterType="HashMap">
+        INSERT INTO DOCTOR_SCHEDULE_TB
+        (EMP_ID_FK, SCHEDULE_CATEGORY, SCHEDULE_TITLE, SCHEDULE_DATE, SCHEDULE_START_TIME, SCHEDULE_END_TIME , SCHEDULE_PLACE, SCHEDULE_CONTENT)
+        VALUES (#{empIdPk}, #{scheduleCategory}, #{scheduleTitle}, #{scheduleDate}, #{startTime}, #{endTime}, #{scheduleLocation}, #{scheduleContent});
+    </insert>
+
+    <select id="getMyScheduleList" parameterType="String" resultType="HashMap">
+        SELECT *
+        FROM DOCTOR_SCHEDULE_TB
+        WHERE EMP_ID_FK = #{empIdPk} AND SCHEDULE_DATE = #{date}
+        ORDER BY SCHEDULE_START_TIME ASC;
+    </select>
+
+    <select id="getSelectedSchedule" parameterType="String" resultType="HashMap">
+        SELECT *
+        FROM DOCTOR_SCHEDULE_TB
+        WHERE SCHEDULE_ID_PK = #{scheduleIdPk};
+    </select>
+
+    <update id="updateSchedule" parameterType="HashMap">
+        UPDATE DOCTOR_SCHEDULE_TB
+        SET SCHEDULE_CATEGORY = #{scheduleCategory}, SCHEDULE_TITLE = #{scheduleTitle}, SCHEDULE_START_TIME = #{startTime}, SCHEDULE_END_TIME = #{endTime},
+            SCHEDULE_PLACE = #{scheduleLocation}, SCHEDULE_CONTENT = #{scheduleContent}
+        WHERE SCHEDULE_ID_PK = #{scheduleIdPk};
+
+    </update>
+
+    <delete id="deleteSchedule" parameterType="String">
+        DELETE
+        FROM DOCTOR_SCHEDULE_TB
+        WHERE SCHEDULE_ID_PK = #{schedulePk}
+    </delete>
+
+    <select id="filterCategory" parameterType="String" resultType="HashMap">
+        SELECT *
+        FROM DOCTOR_SCHEDULE_TB
+        WHERE EMP_ID_FK = #{empIdPk} AND SCHEDULE_DATE = #{date} AND SCHEDULE_CATEGORY = #{category};
+    </select>
+</mapper>

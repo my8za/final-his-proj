@@ -1,0 +1,74 @@
+@import '../../styles/scss/elements';
+@import '../../styles/scss/variables';
+
+.handOver-container{
+  .checkBox-container{
+    margin-top: 13px;
+    margin-left: 950px;
+    padding: 1px;
+    display: flex;
+    div{
+      cursor: pointer; 
+      input{
+      cursor: pointer; 
+      margin-left: 30px;
+      }
+    }
+  }
+  .btn-wapper{
+    margin-left: 990px;
+    display: flex;
+    .btn{
+      margin-left: 12px;
+    }
+  }
+}
+
+.handOver-wapper {
+  width: 99.5%;
+  height: 255px;
+  margin: auto;
+  margin-top: 15px;
+  margin-bottom: 8px;
+  overflow-y: auto;
+  table {
+    width: 100%;
+    font-size: 15px;
+    text-align: left;
+    
+    th,
+    td {
+      padding: 4.1px;
+      border: 1px solid $tblBorder;
+      text-align: center;
+    }
+    th {
+      background-color: $thColor;
+      font-weight: 600;
+    }
+    td {
+      input {width: 100%; height: 100%; border: none; outline: none;}
+    }
+    .handOver-fix{
+      width: 4%;
+      input{
+        margin: 0;
+      }
+    }
+    .handOver-from{
+      width: 12%;
+    }
+    .handOver-date{
+      width: 15%;
+    }
+    .handOver-to{
+      width: 15%;
+    }
+    .handOver-error{
+      margin-top: 75px;
+      margin-left: 200px;
+      font-size: 35px;
+    }
+  }
+}
+

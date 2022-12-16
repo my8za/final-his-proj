@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!--특정 환자 입원 정보 READ-->
+<mapper namespace="com.douzone.HISservice.repository.PatientInfoDAO">
+    <select id="getPatientInfo" parameterType="HashMap" resultType="HashMap">
+        SELECT ADMISSION_ID_PK, ADMISSION_DATE, ADMISSION_DUEDATE, DISCHARGE_DUEDATE, PATIENT_NAME, GENDER, PATIENT_ADDR, PATIENT_TEL, DIAGNOSIS, EMP_NAME, SPECIALITY_NAME,PROTECTOR_NAME,PROTECTOR_TEL,PATIENT_AGE
+        FROM ADMISSION_TB AS a
+        LEFT JOIN TREATMENT_INFO_TB AS b ON a.TREATMENT_NUM_FK = b.TREATMENT_NUM_PK
+        LEFT JOIN PATIENT_TB AS c ON b.PATIENT_ID_FK = c.PATIENT_ID_PK
+        LEFT JOIN EMP_INFO_TB AS d ON b.EMP_ID_FK = d.EMP_ID_PK
+        LEFT JOIN SPECIALITY_TB AS e ON d.SPECIALITY_ID_FK= e.SPECIALITY_ID_PK
+        LEFT JOIN ADMISSION_STATUS AS f ON a.ADMISSION_STATUS_CODE = f.ADMISSION_STATUS_CODE
+        LEFT JOIN DIAGNOSIS_TB AS g ON b.DIAGNOSIS_CODE = g.DIAGNOSIS_CODE
+        WHERE c.PATIENT_NAME = #{name} AND f.AD_CODE_NAME = '입원완료' AND a.WARD = #{ward} AND a.ROOM_NUM = #{roomNum} AND a.BED_NUM= #{bedNum};
+    </select>
+
+    <!--퇴원 예정일 UPDATE -->
+    <update id="changeDischargeDueDate" parameterType="HashMap">
+        UPDATE
+            ADMISSION_TB AS a
+        SET a.DISCHARGE_DUEDATE = #{dischargeDueDate}
+        WHERE ADMISSION_ID_PK = #{admissionIdPk};
+    </update>
+
+    <!-- 환자 등록 정보 READ -->
+    <select id="getPatientRegistrationInfo" parameterType="HashMap" resultType="HashMap">
+        SELECT PATIENT_ID_PK, PATIENT_ADDR, PATIENT_NAME, GENDER, PATIENT_SSN, PATIENT_TEL, PATIENT_AGE, INSURANCE
+        FROM PATIENT_TB
+        WHERE PATIENT_NAME = #{PATIENT_NAME} AND PATIENT_SSN = #{PATIENT_SSN}
+    </select>
+
+    <!-- 환자 과거 병력 READ -->
+    <select id="getTreatmentInfo" parameterType="HashMap" resultType="HashMap">
+        SELECT a.TREATMENT_NUM_PK, a.RECEIVE_ID_FK, a.PATIENT_ID_FK, a.EMP_ID_FK, a.TREATMENT_ORDER, a.MEDICINE, a.DIAGNOSIS_CODE, a.TREATMENT_MEMO, a.TREATMENT_DATE, a.ADMISSION, b.REGISTRATION_TIME
+        FROM TREATMENT_INFO_TB AS a
+                 LEFT JOIN RECEIVE_TB AS b ON b.RECEIVE_ID_PK = a.RECEIVE_ID_FK
+        WHERE a.PATIENT_ID_FK = #{PATIENT_ID_PK}
+    </select>
+
+
+    <!--  해당년월 마지막 환자 쿼리로직 READ  -->
+    <!--  환자등록할 때 쓸 예정  -->
+    <select id="getRecentPK" parameterType="String" resultType="String">
+        SELECT PATIENT_ID_PK
+        FROM PATIENT_TB
+        WHERE PATIENT_ID_PK
+        LIKE '${currYrMnth}%'
+        ORDER BY PATIENT_ID_PK
+        DESC LIMIT 1;
+    </select>
+
+
+    <!--  환자 등록 INSERT -->
+    <insert id="insertPatientInfo" parameterType="HashMap">
+        INSERT INTO PATIENT_TB
+        (PATIENT_ID_PK, PATIENT_ADDR, PATIENT_NAME, GENDER, PATIENT_SSN, PATIENT_TEL, PATIENT_AGE, INSURANCE)
+        VALUES
+            (#{PATIENT_ID_PK}, #{PATIENT_ADDR}, #{PATIENT_NAME}, #{GENDER}, #{PATIENT_SSN}, #{PATIENT_TEL}, #{PATIENT_AGE}, #{INSURANCE})
+    </insert>
+
+<!-- 진료중의 상태의 환자 클릭시 정보 불러오기 -->
+    <select id="getTreatmentPatientInfo" resultType="HashMap">
+        SELECT a.*, b.*, IF(INSURANCE=1, 'O', 'X') AS INSURANCE_CHECK, (SELECT if(COUNT(*) > 1, '재진', '초진') FROM TREATMENT_INFO_TB WHERE PATIENT_ID_FK = '22110151') AS VISITCOUNT, c.TREATMENT_NUM_PK
+        FROM RECEIVE_TB AS a
+                 LEFT JOIN PATIENT_TB AS b ON a.PATIENT_ID_FK = b.PATIENT_ID_PK
+                 LEFT JOIN TREATMENT_INFO_TB AS c ON a.RECEIVE_ID_PK = c.RECEIVE_ID_FK
+        WHERE RECEIVE_ID_PK = #{receivePk};
+    </select>
+
+<!-- 환자 과거 병력 가져오기 -->
+    <select id="getPastTreatmentList" parameterType="String" resultType="HashMap">
+        SELECT TREATMENT_DATE, DIAGNOSIS
+        FROM TREATMENT_INFO_TB AS a
+                 LEFT JOIN DIAGNOSIS_TB AS b ON a.DIAGNOSIS_CODE = b.DIAGNOSIS_CODE
+        WHERE PATIENT_ID_FK = #{patientPk} AND a.DIAGNOSIS_CODE IS NOT NULL;
+    </select>
+
+<!-- 환자 과거 병력 자세히 보기 -->
+    <select id="getPastTreatmentDetail" parameterType="String" resultType="HashMap">
+        SELECT a.*, b.SPECIALITY, b.SYMPTOM, c.*, d.EMP_NAME, e.ADMISSION_DUEDATE, f.DIAGNOSIS,if(INSURANCE=1, 'O', 'X') AS INSURANCE_CHECK, if(TREATMENT_ORDER IS NULL, 'X', 'O') AS TREATMENT_CHECK, if(MEDICINE IS NULL, 'X', 'O') AS MEDICINE_CHECK, if(ADMISSION=1, 'O', 'X') AS ADMISSION_CHECK
+        FROM PATIENT_TB AS a
+                 LEFT JOIN RECEIVE_TB AS b ON a.PATIENT_ID_PK = b.PATIENT_ID_FK
+                 LEFT JOIN TREATMENT_INFO_TB AS c ON a.PATIENT_ID_PK = c.PATIENT_ID_FK
+                 LEFT JOIN EMP_INFO_TB AS d ON d.EMP_ID_PK = c.EMP_ID_FK
+                 LEFT JOIN ADMISSION_TB AS e ON c.TREATMENT_NUM_PK = e.TREATMENT_NUM_FK
+                 LEFT JOIN DIAGNOSIS_TB AS f ON c.DIAGNOSIS_CODE = f.DIAGNOSIS_CODE
+        WHERE c.PATIENT_ID_FK = #{patientID} AND c.TREATMENT_DATE = #{treatmentDate} AND f.DIAGNOSIS_CODE = c.DIAGNOSIS_CODE;
+    </select>
+
+    <!-- 환자 과거 병력 자세히 보기 - 등록시간추가 -->
+    <select id="getTreatmentHistoryDetail" parameterType="String" resultType="HashMap">
+        SELECT a.*, b.SPECIALITY, b.SYMPTOM, c.*, d.EMP_NAME, e.ADMISSION_DUEDATE, f.DIAGNOSIS,if(INSURANCE=1, 'O', 'X') AS INSURANCE_CHECK, if(TREATMENT_ORDER IS NULL, 'X', 'O') AS TREATMENT_CHECK, if(MEDICINE IS NULL, 'X', 'O') AS MEDICINE_CHECK, if(ADMISSION=1, 'O', 'X') AS ADMISSION_CHECK
+        FROM PATIENT_TB AS a
+                 LEFT JOIN RECEIVE_TB AS b ON a.PATIENT_ID_PK = b.PATIENT_ID_FK
+                 LEFT JOIN TREATMENT_INFO_TB AS c ON a.PATIENT_ID_PK = c.PATIENT_ID_FK
+                 LEFT JOIN EMP_INFO_TB AS d ON d.EMP_ID_PK = c.EMP_ID_FK
+                 LEFT JOIN ADMISSION_TB AS e ON c.TREATMENT_NUM_PK = e.TREATMENT_NUM_FK
+                 LEFT JOIN DIAGNOSIS_TB AS f ON c.DIAGNOSIS_CODE = f.DIAGNOSIS_CODE
+        WHERE c.PATIENT_ID_FK = #{patientID} AND b.REGISTRATION_TIME= #{regTime} AND c.TREATMENT_DATE = #{treatmentDate} AND f.DIAGNOSIS_CODE = c.DIAGNOSIS_CODE;
+    </select>
+</mapper>

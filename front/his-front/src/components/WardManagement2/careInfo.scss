@@ -1,0 +1,59 @@
+@import '../../styles/scss/elements';
+@import '../../styles/scss/variables';
+
+.care-info-container{
+  .care-info-wapper {
+    width: 99.5%;
+    height: 138px;
+    margin: auto;
+    margin-top: 14px;
+    overflow-y: auto;
+    table {
+      width: 100%;
+      font-size: 16px;
+      text-align: left;
+      
+      th,
+      td {
+        padding: 1.1px;
+        border: 1px solid $tblBorder;
+        text-align: center;
+      }
+      th {
+        background-color: $thColor;
+        font-weight: 600;
+      }
+      td {
+        input {width: 100%; border: none; outline: none;}
+      }
+      .careInfo-fix{
+        width: 4%;
+        input{
+          margin: 0;
+        }
+      }
+      .careInfo-check{
+        width: 12%;
+        input{
+          margin: auto;
+        }
+      }
+      .careInfo-date{
+        width: 15%;
+      }
+      .careInfo-writer{
+        width: 15%;
+      }
+    }
+  }
+
+  .btn-wapper{
+    
+    margin-left: 990px;
+    display: flex;
+    .btn{
+      
+      margin-left: 12px;
+    }
+  }
+}

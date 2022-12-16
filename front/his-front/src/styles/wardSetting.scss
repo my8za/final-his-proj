@@ -1,0 +1,134 @@
+.wardSetting-wapper{
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1;
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  -webkit-box-sizing:border-box;
+  -moz-box-sizing:border-box;
+  -webkit-font-smoothing:antialiased;
+  -moz-font-smoothing:antialiased;
+  -o-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+  
+      .wardSetting-Body{
+          width: 20%;
+          height: 50%;
+          #wardSetting-content {
+            height: 100%;
+            h5{
+              margin:5px 0 15px;
+	            display:block;
+	            font-size:13px;
+            }
+            .search-patient{
+              position: relative;
+              top : 20px;
+              #searchPatientInput-container{
+                height: 200px;
+                overflow: auto;
+              }
+            }
+          }
+          
+      }
+  }
+  
+#wardSetting-content input[type="text"],
+.inRegister-btn{ font:400 13px/16px "Open Sans", Helvetica, Arial, sans-serif; }
+
+#wardSetting-content {
+	background:#F9F9F9;
+	padding:25px;
+	margin:50px 0;
+}
+
+#wardSetting-content h3 {
+	color: #0af;
+	display: block;
+	font-size: 30px;
+	font-weight: 400;
+  margin-bottom:10px;
+}
+
+fieldset {
+	border: medium none !important;
+	margin: 0 0 10px;
+	min-width: 100%;
+	padding: 0;
+	width: 100%;
+}
+
+#wardSetting-content input[type="text"]{
+	width:100%;
+	border:1px solid #CCC;
+	background:#FFF;
+	padding:10px;
+}
+
+#wardSetting-content input[type="text"]:hover{
+	-webkit-transition:border-color 0.3s ease-in-out;
+	-moz-transition:border-color 0.3s ease-in-out;
+	transition:border-color 0.3s ease-in-out;
+	border:1px solid #AAA;
+}
+
+
+.inRegister-btn {
+  position: relative;
+	cursor:pointer;
+	width:88%;
+	border:none;
+	background:#0af;
+	color:#FFF;
+	margin:0 0 5px;
+	padding:10px;
+	font-size:15px;
+  bottom: 100px;
+  left: 25.5px;
+}
+
+.inRegister-btn:hover {
+	background:#09C;
+	-webkit-transition:background 0.3s ease-in-out;
+	-moz-transition:background 0.3s ease-in-out;
+	transition:background-color 0.3s ease-in-out;
+}
+
+.inRegister-btn:active { box-shadow:inset 0 1px 3px rgba(0, 0, 0, 0.5); }
+
+#wardSetting-content input:focus {
+	outline:0;
+	border:1px solid #999;
+}
+::-webkit-input-placeholder {
+ color:#888;
+}
+:-moz-placeholder {
+ color:#888;
+}
+::-moz-placeholder {
+ color:#888;
+}
+:-ms-input-placeholder {
+ color:#888;
+}
+
+
+#suggestions-list{
+	margin-top: 20px;
+	background-color: #FFF;
+}
+
+#searchPatientInput-list{
+	margin-top: 20px;
+	background-color: #FFF;
+}

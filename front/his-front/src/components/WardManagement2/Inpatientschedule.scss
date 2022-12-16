@@ -1,0 +1,73 @@
+@import '../../styles/scss/elements';
+@import '../../styles/scss/variables';
+
+.schedule-container{
+  .react-datepicker-wrapper{
+    position: relative;
+    left: 85%;   
+    width: 169px;
+  .react-datepicker__input-container{
+    margin-top: 10px;
+    
+    input{
+      width: 100%;
+    text-align: center;
+    height: 30px;
+    border-color: #aaa;
+    border-radius: 1rem;
+    font-size: 14px;
+    box-shadow: inset 0.2rem 0.2rem 0.5rem var(--greyLight-2), inset -0.2rem -0.2rem 0.5rem var(--white);
+    background: none;
+    font-family: inherit;
+    }
+  }
+}
+  .schedule-wapper {
+    width: 99.5%;
+    height: 255px;
+    margin: auto;
+    margin-top: 10px;
+    margin-bottom:6px;
+    overflow-y: auto;
+    table {
+      width: 100%;
+      font-size: 16px;
+      text-align: left;
+      
+      th,
+      td {padding: 3.35px; border: 1px solid $tblBorder;
+        text-align: center;
+      }
+      th {
+        background-color: $thColor;
+        font-weight: 600;
+      }
+      td {
+        input {width: 100%; border: none; outline: none;}
+        width: 10%;
+      }
+      .schedule-fix{
+        width: 4%;
+        input{
+          margin: 0;
+        }
+      }
+      .schedule-content{
+        width: 50%;
+      }
+      .schedule-error{
+        margin-top: 85px;
+        margin-left: 170px;
+        font-size: 35px;
+      }
+    }
+  }
+
+  .btn-wapper{
+    margin-left: 990px;
+    display: flex;
+    .btn{
+      margin-left: 12px;
+    }
+  }
+} 

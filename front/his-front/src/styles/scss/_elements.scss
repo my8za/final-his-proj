@@ -1,0 +1,39 @@
+@import './variables';
+
+%contentBox {
+  border-radius: 7px;
+  box-shadow: 1px 1px 6px 0 rgba(0, 0, 0, 0.25);
+  background-color: $white;
+}
+
+%btn {
+  display: inline-block;
+  width: 75px;
+  height: 30px;
+  border-radius: 4px;
+  background-color: #0af;
+  color: $white;
+  font-size: 14px;
+  text-align: center;
+  text-decoration: none;
+  line-height: 30px;
+  letter-spacing: 2.5px;
+}
+
+%tbl {
+  border: 1px solid $tblBorder;
+  border-radius: 4px;
+}
+
+
+%filter {
+  height: 22px;
+  outline: none; 
+  border: solid 0.1px $tblBorder;
+  box-shadow: 1px 1px 1px 0 rgba(0, 0, 0, 0.15);
+  background-color: $white;
+  color: rgba(0, 0, 0, .8);
+  text-align: center;
+  letter-spacing: 2.5px;
+  
+}

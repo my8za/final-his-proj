@@ -1,0 +1,44 @@
+@import '../../styles/scss/_elements';
+@import '../../styles/scss/variables';
+
+
+.inpatient-detail {
+  margin: auto;
+  margin-top: 20px;
+  height: 150px;
+  width: 97%;
+  
+  background-color: $thColor;
+  table{
+    
+    width: 100%;
+    height: 100%;
+    font-size: 14px;
+    text-align: left;
+    line-height: 14px;
+    th,
+    td {
+       padding: 4px 0 4px 10px; 
+       border: 1px solid $tblBorder;
+       vertical-align: middle;
+        
+        }
+
+    th {
+      font-weight: 600;
+      width: 10%;
+    }
+
+    td{
+      background-color: $white;
+    }
+
+    .devide3{
+      width: 11%;
+    }
+    .devide4{
+      width: 40%;
+    }
+  }
+
+}

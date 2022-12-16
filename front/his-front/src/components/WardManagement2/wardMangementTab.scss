@@ -1,0 +1,49 @@
+div .css-19kzrtu{
+    padding: 0;
+}
+.inpatient-info-wapper{
+    display: flex;
+    height: 30px;
+    align-items: center;
+    grid-column-start: span 4;
+    background :#e6eef2;
+    p{
+      font-size: 14px;
+      span {
+        padding: 0 7px 0 20px;
+        font-weight: 900;}
+    }
+    .discharge-duedate{
+      display: flex;
+      align-items: center;
+      padding: 1rem;
+      font-size: 14px;
+      font-weight: 900;
+      
+      span{
+        padding: 0 5px 0 10px;
+      }
+      input{
+        width: 30px;
+        text-align: center;
+      }
+      .discharge-insert{
+        width: 120px;
+        
+      }
+      .btn{
+        margin-left: 20px;
+        height: 25px;
+        line-height: 25px;
+      }
+    }
+  }
+
+
+.btn-wapper{
+    margin-left: 1150px;
+    .btn{
+      margin-top: 7px;
+      margin-left: 2px;
+     }
+  } 

@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--간호기록-->
+
+<!--특정 환자 간호기록 READ-->
+
+<mapper namespace="com.douzone.HISservice.repository.AdmissionHandlePageDAO">
+    <select id="getCareInfos" parameterType="HashMap" resultType="HashMap">
+        SELECT CARE_DATE, NURSE_NAME, CARE_CONTENT, CARE_ID_PK
+        FROM CARE_TB AS a
+                 LEFT JOIN ADMISSION_TB AS b ON a.ADMISSION_ID_FK = b.ADMISSION_ID_PK
+                 LEFT JOIN TREATMENT_INFO_TB AS c ON b.TREATMENT_NUM_FK = c.TREATMENT_NUM_PK
+                 LEFT JOIN PATIENT_TB AS d ON c.PATIENT_ID_FK = d.PATIENT_ID_PK
+                 LEFT JOIN ADMISSION_STATUS AS e ON b.ADMISSION_STATUS_CODE = e.ADMISSION_STATUS_CODE
+        WHERE d.PATIENT_NAME = #{name} AND e.AD_CODE_NAME = '입원완료' AND b.WARD = #{ward} AND b.ROOM_NUM = #{roomNum} AND b.BED_NUM= #{bedNum}
+        ORDER BY CARE_ID_PK DESC;
+    </select>
+
+    <!--특정 환자 간호기록 CREATE-->
+
+    <insert id="setCareInfo" parameterType="HashMap">
+        INSERT INTO CARE_TB
+        VALUES
+            ( (SELECT CONCAT('C',SUBSTR(NOW(),3,2)*1000000 + 1 + (SELECT COUNT(*) FROM CARE_TB AS a))),
+              (SELECT ADMISSION_ID_PK FROM ADMISSION_TB AS b
+                                               LEFT JOIN ADMISSION_STATUS AS c ON b.ADMISSION_STATUS_CODE = c.ADMISSION_STATUS_CODE
+                                               LEFT JOIN TREATMENT_INFO_TB AS d ON b.TREATMENT_NUM_FK = d.TREATMENT_NUM_PK
+                                               LEFT JOIN PATIENT_TB AS e ON d.PATIENT_ID_FK = e.PATIENT_ID_PK
+               WHERE e.PATIENT_NAME = #{name} AND c.AD_CODE_NAME = '입원완료' AND b.WARD = #{ward} AND b.ROOM_NUM = #{roomNum} AND b.BED_NUM= #{bedNum}),
+              now(),#{nurseName}, #{careContent});
+    </insert>
+
+    <!--특정 환자 간호기록 UPDATE-->
+    <update id="changeCareInfo" parameterType="HashMap">
+        UPDATE
+            CARE_TB AS a
+        SET a.CARE_DATE = NOW() , a.CARE_CONTENT = #{careContent}
+        WHERE CARE_ID_PK = #{careIdPk};
+    </update>
+
+
+    <!--처방기록-->
+
+    <!--특정 환자별 처방기록 READ -->
+
+    <select id="getMediRecords" parameterType="HashMap" resultType="HashMap">
+        SELECT ORDER_DATE, ORDERER, ORDER_CONTENT, MEDICINE_NAME, TAKE_MEDICINE_STATUS, RECORD_ID_PK
+        FROM MEDICINE_RECORD_TB AS a
+                 LEFT JOIN ADMISSION_TB AS b ON a.ADMISSION_ID_FK = b.ADMISSION_ID_PK
+                 LEFT JOIN TREATMENT_INFO_TB AS c ON b.TREATMENT_NUM_FK = c.TREATMENT_NUM_PK
+                 LEFT JOIN PATIENT_TB AS d ON c.PATIENT_ID_FK = d.PATIENT_ID_PK
+                 LEFT JOIN ADMISSION_STATUS AS e ON b.ADMISSION_STATUS_CODE = e.ADMISSION_STATUS_CODE
+        WHERE d.PATIENT_NAME = #{name} AND e.AD_CODE_NAME = '입원완료' AND b.WARD = #{ward}  AND b.ROOM_NUM = #{roomNum} AND b.BED_NUM= #{bedNum}
+        ORDER BY RECORD_ID_PK DESC;
+    </select>
+
+    <!--특정 환자별 처방기록 CREATE-->
+
+    <insert id="setMediRecord" parameterType="HashMap">
+        INSERT INTO MEDICINE_RECORD_TB
+        VALUES
+            ( (SELECT CONCAT('MR',SUBSTR(NOW(),3,2)*1000000 + 1 + (SELECT COUNT(*) FROM MEDICINE_RECORD_TB AS a))),
+              (SELECT ADMISSION_ID_PK FROM ADMISSION_TB AS b
+                                               LEFT JOIN ADMISSION_STATUS AS c ON b.ADMISSION_STATUS_CODE = c.ADMISSION_STATUS_CODE
+                                               LEFT JOIN TREATMENT_INFO_TB AS d ON b.TREATMENT_NUM_FK = d.TREATMENT_NUM_PK
+                                               LEFT JOIN PATIENT_TB AS e ON d.PATIENT_ID_FK = e.PATIENT_ID_PK
+               WHERE e.PATIENT_NAME = #{name} AND c.AD_CODE_NAME = '입원완료' AND b.WARD = #{ward}  AND b.ROOM_NUM = #{roomNum} AND b.BED_NUM= #{bedNum}),
+              NOW(),#{oderer}, #{oderContent}, #{medicineName},0);
+    </insert>
+
+    <!--특정 환자별 처방기록 UPDATE-->
+    <update id="changeMediRecord" parameterType="HashMap">
+        UPDATE
+            MEDICINE_RECORD_TB AS a
+        SET a.ORDER_CONTENT = #{orderContent}, a.MEDICINE_NAME = #{medicineName}
+        WHERE RECORD_ID_PK = #{recordIdPk} ;
+    </update>
+
+    <!--복약 체크 시 상태 업데이트 UPDATE-->
+    <update id="changeTakeMediStatus" parameterType="HashMap">
+        UPDATE
+            MEDICINE_RECORD_TB AS a
+        SET a.TAKE_MEDICINE_STATUS = #{takeMedicineStatus}
+        WHERE RECORD_ID_PK = #{recordIdPk} ;
+    </update>
+
+
+    <!-- 환자일정 -->
+
+    <!--해당 병동 전체 환자 일정 READ-->
+    <select id="getInpatientSchedules" parameterType="HashMap" resultType="HashMap">
+        SELECT SCHEDULE_DATE, SCHEDULE_PLACE, SCHEDULE_CONTENT, PS_CODE_NAME, PATIENT_NAME, SCHEDULE_ID_PK
+        FROM PATIENT_SCHEDULE_TB AS a
+                 LEFT JOIN ADMISSION_TB AS b ON a.ADMISSION_ID_FK = b.ADMISSION_ID_PK
+                 LEFT JOIN TREATMENT_INFO_TB AS c ON c.TREATMENT_NUM_PK = b.TREATMENT_NUM_FK
+                 LEFT JOIN PATIENT_TB AS d ON d.PATIENT_ID_PK = c.PATIENT_ID_FK
+                 LEFT JOIN ADMISSION_STATUS AS e on b.ADMISSION_STATUS_CODE = e.ADMISSION_STATUS_CODE
+                 LEFT JOIN PATIENT_SCHEDULE_STATUS AS f ON a.SCHEDULE_STATUS = f.SCHEDULE_STATUS
+        WHERE b.WARD = (SELECT WARD FROM SPECIALITY_TB AS g WHERE g.SPECIALITY_NAME = #{specialityName}) AND e.AD_CODE_NAME = '입원완료' AND substr(a.SCHEDULE_DATE,1,10) = substr(#{scheduleDate},1,10)
+        ORDER BY SCHEDULE_DATE DESC;
+    </select>
+
+    <!--해당 병동 전체 환자 일정 CREATE-->
+    <insert id="setInpatientSchedule" parameterType="HashMap">
+        INSERT INTO PATIENT_SCHEDULE_TB
+        VALUES
+            ( (SELECT CONCAT('PC',SUBSTR(NOW(),3,2)*1000000 + 1 + (SELECT COUNT(*) FROM PATIENT_SCHEDULE_TB AS a))),
+              (SELECT ADMISSION_ID_PK FROM ADMISSION_TB AS b
+                                               LEFT JOIN ADMISSION_STATUS AS c ON b.ADMISSION_STATUS_CODE = c.ADMISSION_STATUS_CODE
+                                               LEFT JOIN TREATMENT_INFO_TB AS d ON b.TREATMENT_NUM_FK = d.TREATMENT_NUM_PK
+                                               LEFT JOIN PATIENT_TB AS e ON d.PATIENT_ID_FK = e.PATIENT_ID_PK
+               WHERE e.PATIENT_NAME = #{name} AND c.AD_CODE_NAME = '입원완료' AND b.WARD = #{ward} AND b.ROOM_NUM = #{roomNum} AND b.BED_NUM= #{bedNum}),
+              'SA' ,#{scheduleDate},#{schedulePlace}, #{scheduleContent} , #{LastModifier});
+    </insert>
+
+    <!--해당 병동 전체 환자 일정 UPDATE-->
+    <update id="changeSchedule" parameterType="HashMap">
+        UPDATE
+            PATIENT_SCHEDULE_TB AS a
+        SET a.SCHEDULE_DATE = #{scheduleDate}, a.SCHEDULE_CONTENT = #{scheduleContent} , a.SCHEDULE_PLACE = #{schedulePlace}, a.LAST_MODIFIER= #{LastModifier}
+        WHERE SCHEDULE_ID_PK = #{scheduleIdPk};
+    </update>
+
+    <!--해당 병동 전체 환자 일정 상태 UPDATE-->
+    <update id="changeScheduleStatus" parameterType="HashMap">
+        UPDATE
+            PATIENT_SCHEDULE_TB AS a
+        SET a.SCHEDULE_STATUS =(SELECT SCHEDULE_STATUS from patient_schedule_status WHERE PS_CODE_NAME = #{scheduleStatus})
+        WHERE a.SCHEDULE_ID_PK = #{scheduleIdPk};
+    </update>
+
+    <!-- 인계 사항 -->
+
+    <!--나에게 전달 된 인계사항 READ-->
+    <select id="getReceiveHandOver" parameterType="HashMap" resultType="HashMap">
+        SELECT HANDOVER_DATE, EMP_NAME, HANDOVER_TARGET, HANDOVER_CONTENT , HANDOVER_ID_PK
+        FROM HANDOVER_TB AS a
+                 LEFT JOIN EMP_INFO_TB AS b ON a.EMP_ID_FK = b.EMP_ID_PK
+                 LEFT JOIN SPECIALITY_TB AS c ON b.SPECIALITY_ID_FK = c.SPECIALITY_ID_PK
+        WHERE DATE(a.HANDOVER_DATE) BETWEEN DATE(now()) - 2 and DATE(now())+ 1
+          AND a.HANDOVER_TARGET = (SELECT EMP_NAME FROM EMP_INFO_TB WHERE USERNAME = #{userName})
+        ORDER BY HANDOVER_ID_PK DESC;
+    </select>
+
+    <!--내가 작성한 인계사항 READ-->
+    <select id="getSendHandOver" parameterType="HashMap" resultType="HashMap">
+        SELECT HANDOVER_DATE, EMP_NAME, HANDOVER_TARGET, HANDOVER_CONTENT , HANDOVER_ID_PK
+        FROM HANDOVER_TB AS a
+                 LEFT JOIN EMP_INFO_TB AS b ON a.EMP_ID_FK = b.EMP_ID_PK
+                 LEFT JOIN SPECIALITY_TB AS c ON b.SPECIALITY_ID_FK = c.SPECIALITY_ID_PK
+        WHERE EMP_NAME = (SELECT EMP_NAME FROM EMP_INFO_TB WHERE USERNAME = #{userName}) AND DATE(a.HANDOVER_DATE) BETWEEN DATE(now()) - 2 and DATE(now())+ 1
+        ORDER BY HANDOVER_ID_PK DESC;
+    </select>
+
+    <!--인계 사항 작성 하기 위한 직원 검색-->
+    <select id="getInNurseList" resultType="HashMap">
+        SELECT EMP_NAME, substr(ROLE,6) AS ROLE , USERNAME, SPECIALITY_NAME, EMP_EMAIL FROM EMP_INFO_TB AS a
+            LEFT JOIN SPECIALITY_TB AS b ON a.SPECIALITY_ID_FK = b.SPECIALITY_ID_PK
+        WHERE substr(ROLE,6) = 'INNURSE';
+    </select>
+
+    <!--인계 사항 CREATE-->
+    <insert id="setHandOver" parameterType="HashMap">
+        INSERT INTO HANDOVER_TB
+        VALUES
+            ( (SELECT concat('H',substr(now(),3,2)*1000000 + 1 + (SELECT COUNT(*) FROM HANDOVER_TB AS a))),
+              (SELECT EMP_ID_PK FROM EMP_INFO_TB WHERE USERNAME = #{userName}), now() ,
+              (SELECT EMP_NAME FROM EMP_INFO_TB WHERE USERNAME = #{handOverTarget}),
+              #{handOverContent});
+    </insert>
+
+
+
+    <!--내가 작성한 인계사항 UPDATE-->
+    <update id="changeHandover" parameterType="HashMap">
+        UPDATE
+            HANDOVER_TB AS a
+        SET a.HANDOVER_DATE = now() ,
+            a.HANDOVER_TARGET = (SELECT EMP_NAME FROM EMP_INFO_TB WHERE EMP_NAME = #{handOverTarget}) ,
+            a.HANDOVER_CONTENT = #{handOverContent}
+        WHERE HANDOVER_ID_PK = #{handOverPK};
+    </update>
+
+
+
+    <!-- 소켓 환자 호출 현황 -->
+
+    <!-- 로딩 시 호출 현황 READ -->
+
+    <select id="getInPatientReq" parameterType="HashMap" resultType="HashMap">
+        SELECT PATIENT_NAME AS patientName , PR_CODE_NAME AS callStatus, SUBSTR(REQUEST_TIME,12) AS callTime , a.WARD AS ward, a.ROOM_NUM AS roomNum, a.BED_NUM AS bedNum FROM BED_TB AS a
+                LEFT JOIN PATIENT_REQUEST_STATUS AS b ON  b.REQUEST_STATUS = a.REQUEST_STATUS
+                LEFT JOIN ADMISSION_TB AS c ON  c.WARD = a.WARD  and c.ROOM_NUM = a.ROOM_NUM and c.BED_NUM = a.BED_NUM
+                LEFT JOIN ADMISSION_STATUS AS d ON d.ADMISSION_STATUS_CODE = c.ADMISSION_STATUS_CODE
+                LEFT JOIN TREATMENT_INFO_TB AS e ON e.TREATMENT_NUM_PK = c.TREATMENT_NUM_FK
+                LEFT JOIN PATIENT_TB AS f ON f.PATIENT_ID_PK = e.PATIENT_ID_FK
+        WHERE AD_CODE_NAME = "입원완료" AND (PR_CODE_NAME = "호출" OR PR_CODE_NAME = "확인") AND a.WARD = (SELECT WARD from SPECIALITY_TB where SPECIALITY_NAME = #{specialityName})
+        ORDER BY REQUEST_TIME DESC;
+    </select>
+    <!--환자, 간호사 소켓 요청 시 UPDATE-->
+    <update id="changeInPatientReq" parameterType="HashMap">
+        UPDATE
+            BED_TB AS a
+        SET REQUEST_STATUS = (SELECT REQUEST_STATUS FROM PATIENT_REQUEST_STATUS WHERE PR_CODE_NAME = #{callStatus}),
+            REQUEST_TIME = #{callTime}
+        WHERE a.WARD = #{ward} AND a.ROOM_NUM= #{roomNum} AND a.BED_NUM = #{bedNum};
+    </update>
+
+</mapper>
+

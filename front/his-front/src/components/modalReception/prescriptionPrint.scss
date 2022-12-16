@@ -1,0 +1,53 @@
+.prescription-wrapper {
+  width: 680px;
+  height: 940px;
+  padding: 30px 20px;
+  border: 1px solid #444444;
+  box-sizing: border-box;
+  font-size: 15px;
+  background-color: white;
+  .prescription-content {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+  }
+  .insurance-target {
+    text-align: left;
+  }
+  .prescription-title {
+    height: 45px;
+    padding: 5px;
+    font-size: 25px;
+    letter-spacing: 10px;
+  }
+  table {
+  width: 100%;
+  height: 90%;
+  border: 1px solid #444444;
+  border-collapse: collapse;
+  text-align: center;
+  }
+  th, td {
+    border: .5px solid #444444;
+    font-weight: normal;
+    text-align: center;
+    vertical-align: middle;
+  }
+  .align-box{height: 20px;}
+  .align1{width: 15%;}
+  .align2{width: 25%;}
+  .align3{width: 20%;}
+  .align-top {vertical-align: 0; line-height: 16px; padding-top: 10px;}
+  .text-mode {writing-mode: vertical-rl; width: 8%;}
+  .thick{background-color: #E0DEEB;}
+
+  white-space: pre-wrap;
+}
+
+.print-btn {
+  position: absolute;
+  bottom: 40px;
+  left: 47%;
+}

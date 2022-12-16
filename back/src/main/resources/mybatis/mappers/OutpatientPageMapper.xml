@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+
+<mapper namespace="com.douzone.HISservice.repository.OutpatientPageDAO">
+    <!--특정 환자 진료메모, 치료오더 READ-->
+    <select id="getTreatmentInfos" parameterType="HashMap" resultType="HashMap">
+        <!-- select 쿼리 -->
+        SELECT D.OUTPATIENT_STATUS_CODE, D.OP_CODE_NAME , C.PATIENT_ADDR, C.PATIENT_NAME, C.GENDER, C.PATIENT_SSN, C.PATIENT_TEL,
+               C.PATIENT_AGE, C.INSURANCE, B.SYMPTOM, B.RECEIVE_ID_PK, A.DIAGNOSIS_CODE, A.TREATMENT_MEMO, A.MEDICINE, A.TREATMENT_ORDER
+        FROM TREATMENT_INFO_TB AS A
+        LEFT JOIN RECEIVE_TB AS B ON A.RECEIVE_ID_FK = B.RECEIVE_ID_PK
+        LEFT JOIN PATIENT_TB AS C ON A.PATIENT_ID_FK = C.PATIENT_ID_PK
+        LEFT JOIN OUTPATIENT_STATUS AS D ON B.OUTPATIENT_STATUS_CODE = D.OUTPATIENT_STATUS_CODE
+        WHERE RECEIVE_ID_PK = #{receiveId};
+    </select>
+
+    <!-- 대기 환자 진찰로 상태 변경시 TREATMENT_INFO_TB INSERT-->
+    <insert id="addPatientStatusInfo" parameterType="HashMap">
+        INSERT INTO TREATMENT_INFO_TB (TREATMENT_NUM_PK, RECEIVE_ID_FK,  PATIENT_ID_FK, EMP_ID_FK)
+        VALUES ((SELECT CONCAT('T', SUBSTR(NOW(), 3, 2) * 1000000 + 1 + (SELECT COUNT(*) FROM TREATMENT_INFO_TB AS T))),
+            #{receiveId},
+            #{patientId},
+            #{empId}
+            );
+    </insert>
+
+</mapper>

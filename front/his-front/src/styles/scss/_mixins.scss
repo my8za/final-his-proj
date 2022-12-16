@@ -1,0 +1,21 @@
+// variables 변수
+// $minIphone: 375px;   // i-phone 8기준
+// $maxIphone: 667px;   // i-phone 8기준
+$minTablet: 834px;
+$maxTablet: 1194px;
+
+@mixin responsive($device) {
+  @if $device == 'tablet' {
+      @media screen and (min-width: $minTablet) and (max-width: $maxTablet) {
+        @content;
+      }
+  } @else if $device == 'tablet-l' {  //아이패드 가로사이즈
+      @media screen and (min-width: $minTablet) and (max-width: $maxTablet) and (orientation: landscape) {
+        @content;
+      }
+  }
+}
+
+
+// portrait 세로
+//landscape 가로

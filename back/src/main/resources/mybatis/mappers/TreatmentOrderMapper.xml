@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.douzone.HISservice.repository.TreatmentOrderDAO">
+    <update id="setMedicalCharts" parameterType="HashMap">
+        UPDATE TREATMENT_INFO_TB
+        SET TREATMENT_ORDER = #{treatmentOrder} <if test="!medicineOrder.isEmpty()">, MEDICINE = <foreach collection="medicineOrder" item="arr" open="(" close=")">#{arr}</foreach> </if>, DIAGNOSIS_CODE = #{diagnosis},
+        TREATMENT_MEMO= #{treatmentMemo}, TREATMENT_DATE = now(), ADMISSION = #{admissionCheck}
+        WHERE RECEIVE_ID_FK = #{receivePk};
+    </update>
+
+    <insert id="setAdmissionDueDate" parameterType="HashMap">
+        INSERT INTO ADMISSION_TB
+        VALUES ((SELECT CONCAT('A',SUBSTR(NOW(),3,2)*1000000 + 1 + (SELECT COUNT(*) FROM ADMISSION_TB AS a))), #{treatmentPk}, 'IA', null, null, null, #{admissionOrder}, null, null, null, null, null, null, null);
+    </insert>
+
+    <update id="setPatientStatus" parameterType="String">
+        UPDATE RECEIVE_TB
+        SET OUTPATIENT_STATUS_CODE = #{patientStatus}
+        WHERE RECEIVE_ID_PK = #{receivePk}
+    </update>
+
+    <select id="getDiagnosisList" parameterType="String" resultType="HashMap">
+        SELECT DIAGNOSIS_CODE, DIAGNOSIS
+        FROM DIAGNOSIS_TB
+        WHERE SPECIALITY_ID_FK = #{specialityId};
+    </select>
+
+    <select id="getMedicineList" parameterType="String" resultType="HashMap">
+        SELECT *
+        FROM MEDICINE_TB
+        WHERE DIAGNOSIS_CODE IN (SELECT DIAGNOSIS_CODE FROM DIAGNOSIS_TB WHERE DIAGNOSIS_CODE=#{diagnosis});
+    </select>
+</mapper>

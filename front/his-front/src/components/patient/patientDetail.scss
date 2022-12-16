@@ -1,0 +1,22 @@
+@import '../../styles/scss/_elements';
+@import '../../styles/scss/variables';
+
+.patient-detail {
+  table {
+    width: 100%;
+    font-size: 14px;
+    text-align: left;
+    th,
+    td {padding: 4px 0 4px 10px; border: 1px solid $tblBorder;
+      &.devide1 {width: 6%;}
+    }
+    th {
+      background-color: $thColor;
+      font-weight: 600;
+    }
+    td {
+      input {width: 100%; border: none; outline: none;}
+      select {width: 100%; border: none; outline: none;}
+    }
+  }
+}
